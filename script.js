@@ -352,8 +352,35 @@ console.log('Portfolio script loaded successfully!');
     if(!val) return;
     appendMessage(val, 'user');
     input.value = '';
-    // if user greets, reply with helpful greeting and prompt to pick a preset
+    // custom keyword/responses (priority checks)
     const lower = val.toLowerCase();
+
+    // contains 'abel' -> joanaa with pointing emojis
+    if (lower.includes('abel')) {
+      setTimeout(()=>{
+        appendMessage('joanaa 👉👈', 'bot');
+      }, 350);
+      return;
+    }
+
+    // contains 'abhiram' -> bestie
+    if (lower.includes('abhiram')) {
+      setTimeout(()=>{
+        appendMessage('bestie', 'bot');
+      }, 350);
+      return;
+    }
+
+    // exact "whos better" (also accept who's) -> SEEYUHH + heart
+    const cleaned = lower.replace(/[\W_]+/g,' ').trim();
+    if (cleaned === "whos better" || cleaned === "who s better" || cleaned === "who's better") {
+      setTimeout(()=>{
+        appendMessage('SEEYUHH ❤️', 'bot');
+      }, 350);
+      return;
+    }
+
+    // if user greets, reply with helpful greeting and prompt to pick a preset
     const greetings = ['hi', 'hello', 'hey'];
     if (greetings.includes(lower)) {
       setTimeout(()=>{
