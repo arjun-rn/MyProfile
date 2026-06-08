@@ -346,14 +346,81 @@ console.log('Portfolio script loaded successfully!');
     }
   });
 
+  // FLAMES game state
+  let flamesState = null;
+  let flamesName1 = '';
+  let flamesName2 = '';
+
+  function calculateFlames(name1, name2) {
+    name1 = name1.toLowerCase().replace(/\s/g, '');
+    name2 = name2.toLowerCase().replace(/\s/g, '');
+    
+    let temp1 = name1.split('');
+    let temp2 = name2.split('');
+    
+    // Remove common letters
+    temp1 = temp1.filter(char => {
+      const idx = temp2.indexOf(char);
+      if (idx !== -1) {
+        temp2.splice(idx, 1);
+        return false;
+      }
+      return true;
+    });
+    
+    const count = temp1.length + temp2.length;
+    const flames = ['Friends', 'Lovers', 'Acquaintances', 'Mates', 'Enemies', 'Siblings'];
+    
+    let idx = 0;
+    let remaining = flames.slice();
+    let step = count;
+    
+    while (remaining.length > 1) {
+      idx = (step - 1) % remaining.length;
+      remaining.splice(idx, 1);
+    }
+    
+    return remaining[0];
+  }
+
   form.addEventListener('submit', (e)=>{
     e.preventDefault();
     const val = input.value.trim();
     if(!val) return;
     appendMessage(val, 'user');
     input.value = '';
+    
+    // FLAMES game flow
+    if (flamesState === 'waiting_name1') {
+      flamesName1 = val;
+      flamesState = 'waiting_name2';
+      setTimeout(()=>{
+        appendMessage(`Got it! "${val}" – now, what's the second name?`, 'bot');
+      }, 350);
+      return;
+    }
+    
+    if (flamesState === 'waiting_name2') {
+      flamesName2 = val;
+      const result = calculateFlames(flamesName1, flamesName2);
+      flamesState = null;
+      setTimeout(()=>{
+        appendMessage(`✨ ${flamesName1} & ${val}: ${result} ✨`, 'bot');
+      }, 350);
+      return;
+    }
+    
     // custom keyword/responses (priority checks)
     const lower = val.toLowerCase();
+
+    // Start FLAMES game
+    if (lower === 'flames' || lower.includes('play flames')) {
+      flamesState = 'waiting_name1';
+      setTimeout(()=>{
+        appendMessage("Let's play FLAMES! 💕 What's the first name?", 'bot');
+      }, 350);
+      return;
+    }
 
     // contains 'abel' -> joanaa with pointing emojis
     if (lower.includes('abel')) {
